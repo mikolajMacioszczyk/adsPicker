@@ -24,6 +24,10 @@ class Ad(Base):
             tag.use()
         self.tags = tags
 
+    @classmethod
+    def default(cls):
+        return Ad('title', 'description', 'path', ['tag'])
+
     def adTag(self, tag):
         if tag not in self.tags:
             tag.use()
