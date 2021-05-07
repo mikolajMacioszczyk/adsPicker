@@ -11,4 +11,4 @@ context = Context()
 context.addAd(ad1)
 
 print("Id po: ", ad1.id)
-print("z bazy: ", context.getAd(ad1.id))
+print("z bazy: ", context.getAdById(ad1.id))
