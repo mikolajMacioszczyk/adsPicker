@@ -20,11 +20,24 @@ class Ad(Base):
         self.title = title
         self.description = description
         self.imagePath = imagePath
+        for tag in tags:
+            tag.use()
         self.tags = tags
 
     def adTag(self, tag):
         if tag not in self.tags:
+            tag.use()
             self.tags.append(tag)
+
+    def update(self, updated):
+        self.title = updated.title
+        self.description = updated.description
+        self.imagePath = updated.imagePath
+        for tag in self.tags:
+            tag.unUse()
+        for tag in updated.tags:
+            tag.use()
+        self.tags = updated.tags
 
     def __str__(self):
         return f"{self.id}. {self.title} {self.description} {self.imagePath} tags: {', '.join([t.value for t in self.tags])}"
@@ -33,10 +46,18 @@ class Ad(Base):
 class Tag(Base):
     __tablename__ = 'tags'
     id = Column(Integer, primary_key=True)
+    useCount = Column(Integer)
     value = Column('value', String(50))
 
     def __init__(self, value):
         self.value = value
+        self.useCount = 0
+
+    def use(self):
+        self.useCount += 1
+
+    def unUse(self):
+        self.useCount -= 1
 
     def __str__(self):
         return f"{self.id}. {self.value}"

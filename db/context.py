@@ -1,4 +1,4 @@
-from Models import Ad, Tag
+from Models import Ad, Tag, ad_tags_association
 from base import Base, Session, engine
 
 
@@ -20,10 +20,50 @@ class Context:
             if fromDb is None:
                 self.session.add(tag)
             else:
+                ad.tags[i].unUse()
                 ad.tags[i] = fromDb
+                fromDb.use()
         self.session.commit()
         self.session.add(ad)
         self.session.commit()
+
+    def updateAd(self, adId, updated):
+        fromDb = self.getAdById(adId)
+        if fromDb is None:
+            return None
+        fromDb.update(updated)
+        for i in range(0, len(fromDb.tags)):
+            self.updateAd(fromDb, i)
+        self.session.commit()
+        return fromDb
+
+    def _updateTag(self, ad, index):
+        tag = ad.tags[index]
+        tagFromDb = self.getTagByValue(tag.value)
+        if tagFromDb is None:
+            self.session.add(tag)
+        else:
+            ad.tags[index].unUse()
+            ad.tags[index] = tagFromDb
+            tagFromDb.use()
+
+    def removeAd(self, adId):
+        fromDb = self.getAdById(adId)
+        if fromDb is None:
+            return False
+        for tag in fromDb.tags:
+            self._unhookTag(tag)
+        self.session.commit()
+        self.session.delete(fromDb)
+        self.session.commit()
+        return True
+
+    def _unhookTag(self, tag):
+        tag.unUse()
+        if tag.useCount == 0:
+            self.session.query(ad_tags_association).filter(tag_id=tag.id).delete()
+            self.session.commit()
+            self.session.delete(tag)
 
     def getTagById(self, tagId):
         return self.session.query(Tag).get(tagId)
