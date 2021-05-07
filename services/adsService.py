@@ -2,7 +2,6 @@ from Models import Ad
 
 
 class AdsService:
-
     def __init__(self, context):
         self.context = context
 

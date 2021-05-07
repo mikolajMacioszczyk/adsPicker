@@ -14,7 +14,7 @@ class Context:
         return self.session.query(Ad).filter_by(title=title).one_or_none()
 
     def getAdsByTag(self, tag):
-        return self.session.query(Ad).filter_by(lambda ad: tag.value in [t.value for t in ad.tags])
+        return self.session.query(Ad).filter(Ad.tags.any(Tag.value.in_([tag]))).all()
 
     def addAd(self, ad):
         for i in range(0, len(ad.tags)):
@@ -31,7 +31,7 @@ class Context:
         self.session.commit()
 
     def getAds(self, limit, offset=0):
-        return self.session.query(Ad).limit(limit).offset(offset)
+        return self.session.query(Ad).limit(limit).offset(offset).all()
 
     def updateAd(self, adId, updated):
         fromDb = self.getAdById(adId)
@@ -82,5 +82,8 @@ class Context:
         self.session.commit()
 
     def __del__(self):
-        self.session.close()
+        try:
+            self.session.close()
+        except AttributeError as err:
+            print(err)
 
