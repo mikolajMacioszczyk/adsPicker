@@ -1,4 +1,4 @@
-from Models import Ad
+from Models.ad import Ad
 from spacy.lang.pl import Polish
 from spacy.lang.en import English
 from nltk.stem import PorterStemmer

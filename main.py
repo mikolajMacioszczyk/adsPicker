@@ -1,4 +1,3 @@
-from Models import Ad, Tag
 from db.context import Context
 from services.adsService import AdsService
 

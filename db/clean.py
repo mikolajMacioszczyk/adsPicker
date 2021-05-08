@@ -1,5 +1,5 @@
-from Models import Ad, Tag, ad_tags_association
-from base import Base, Session, engine
+from Models.ad_tags import Ad, Tag, ad_tags_association
+from db.base import Base, Session, engine
 
 Base.metadata.create_all(engine)
 
