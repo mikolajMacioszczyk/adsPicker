@@ -13,8 +13,8 @@ class Context:
     def getAdByTitle(self, title):
         return self.session.query(Ad).filter_by(title=title).one_or_none()
 
-    def getAdsByTag(self, tag):
-        return self.session.query(Ad).filter(Ad.tags.any(Tag.value.in_([tag]))).all()
+    def getAdsByTags(self, tags):
+        return self.session.query(Ad).filter(Ad.tags.any(Tag.value.in_(tags))).all()
 
     def addAd(self, ad):
         for i in range(0, len(ad.tags)):

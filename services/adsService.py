@@ -9,19 +9,29 @@ class AdsService:
     def __init__(self, context):
         self.context = context
 
-    def getByTags(self, query, language='pl'):
+    def getByTags(self, query, maxCount=1, language='pl', useGlove=False):
         words = self._getMeaningfulWords(query, language)
-        # use glove
-        # wyszukać odpowiadające wraz z licznością
-        # jeśli są jakieś:
-        # sortując według liczności wybrać najbardziej trafne
-        # w przeciwnym wypadku:
-        # daj obojętnie jakiego
-        # TODO: Search by tags
-        return words
-        pass
+        if useGlove:
+            raise NotImplemented()
+        else:
+            results = self._countMatches(words)
+            if results:
+                return max(results.items(), key=lambda kv: kv[1])[:maxCount]
+            else:
+                return self.getAny(maxCount)
 
-    def _getMeaningfulWords(self, query, language):
+    def _countMatches(self, words):
+        results = {}
+        for word in words:
+            for ad in self.context.getAdsByTags([word]):
+                if ad not in results:
+                    results[ad] = 1
+                else:
+                    results[ad] += 1
+        return results
+
+    @staticmethod
+    def _getMeaningfulWords(query, language):
         if language == 'pl':
             nlp = Polish()
         elif language == 'en':
@@ -40,8 +50,8 @@ class AdsService:
                 filtered_query.append(ps.stem(word))
         return filtered_query
 
-    def getAny(self):
-        result = self.context.getAds(1)
+    def getAny(self, maxCount=1):
+        result = self.context.getAds(maxCount)
         if len(result) > 0:
-            return result[0]
-        return Ad.default()
+            return result[:maxCount]
+        return [Ad.default()]
