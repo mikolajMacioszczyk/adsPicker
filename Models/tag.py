@@ -18,5 +18,8 @@ class Tag(Base):
     def unUse(self):
         self.useCount -= 1
 
+    def __repr__(self):
+        return {'id': self.id, 'value': self.value, 'useCount': self.useCount}
+
     def __str__(self):
         return f"{self.id}. {self.value}"

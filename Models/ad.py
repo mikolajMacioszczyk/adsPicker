@@ -39,5 +39,8 @@ class Ad(Base):
             tag.use()
         self.tags = updated.tags
 
+    def __repr__(self):
+        return {'id': self.id, 'title': self.title, 'description': self.description, 'imagePath': self.imagePath, 'tags': [tag.__repr__() for tag in self.tags]}
+
     def __str__(self):
         return f"{self.id}. {self.title} {self.description} {self.imagePath} tags: {', '.join([t.value for t in self.tags])}"
