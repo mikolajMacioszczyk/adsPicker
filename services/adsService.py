@@ -16,7 +16,7 @@ class AdsService:
         return self.__context.getAdByTitle(title)
 
     def getByTags(self, query, maxCount=1, language='pl', useGlove=False):
-        words = self._getMeaningfulWords(query, language)
+        words = self._getMeaningfulWords(query.lower(), language)
         if useGlove:
             #TODO: Implement
             raise NotImplemented()

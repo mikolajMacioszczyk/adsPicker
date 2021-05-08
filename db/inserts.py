@@ -1,22 +1,34 @@
-from Models.ad_tags import Ad, Tag
+from Models.ad import Ad
+from Models.tag import Tag
 from db.base import Base, Session, engine
 
 Base.metadata.create_all(engine)
 
 session = Session()
 
-tag1 = Tag("tag1")
-tag2 = Tag("tag2")
-tag3 = Tag("tag3")
+shapeTag = Tag("shape")
+rectangleTag = Tag("rectangle")
+circleTag = Tag("circle")
+squareTag = Tag("square")
 
-ad1 = Ad("ad1Title", "ad1Desc", "ad1Image", [tag1, tag2])
-ad2 = Ad("ad2Title", "ad2Desc", "ad2Image", [tag2, tag3])
+blueTag = Tag("blue")
+redTag = Tag("red")
+greenTag = Tag("green")
 
-session.add(tag1)
-session.add(tag2)
-session.add(tag3)
+ad1 = Ad("red", "rectangle", "rectangle.png", [shapeTag, rectangleTag, redTag])
+ad2 = Ad("blue", "circle", "circle.png", [shapeTag, circleTag, blueTag])
+ad3 = Ad("green", "square", "square.png", [shapeTag, rectangleTag, squareTag, greenTag])
+
+session.add(shapeTag)
+session.add(rectangleTag)
+session.add(circleTag)
+session.add(squareTag)
+session.add(blueTag)
+session.add(redTag)
+session.add(greenTag)
 session.add(ad1)
 session.add(ad2)
+session.add(ad3)
 
 session.commit()
 session.close()

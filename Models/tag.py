@@ -9,7 +9,7 @@ class Tag(Base):
     value = Column('value', String(50))
 
     def __init__(self, value):
-        self.value = value
+        self.value = value.lower()
         self.useCount = 0
 
     def use(self):

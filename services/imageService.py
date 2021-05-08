@@ -12,4 +12,4 @@ class ImageService:
         cv2.imwrite(f"{self.dir}\\{path}", image)
 
     def getImage(self, path):
-        return cv2.imread(self.dir+path)
+        return cv2.imread(f"{self.dir}\\{path}")

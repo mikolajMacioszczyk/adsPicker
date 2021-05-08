@@ -1,22 +1,27 @@
 import flask
 from flask import request, jsonify
 from services.adsService import AdsService
+from services.imageService import ImageService
 from db.context import Context
+import cv2
+import base64
 
 
 def start():
     app = flask.Flask(__name__)
     app.config['DEBUG'] = True
     adsService = AdsService(Context())
+    imageService = ImageService()
 
     @app.route('/', methods=['GET'])
     def home():
         return "<p>Api endpoints: </p>" \
                "<ul>" \
                "<li>home: /</li>" \
-               "<li>allAds: /api/all?count=[count]</li>" \
-               "<li>byId: /api/byId?id=[id]</li>" \
-               "<li>byQuery: /api/byQuery?query=[query]&count=[count]&lang=[lang]</li>" \
+               "<li>all ads: /api/all?count=[count]</li>" \
+               "<li>ad by Id: /api/byId?id=[id]</li>" \
+               "<li>ad image by id: /api/image/byId?id=[id]</li>" \
+               "<li>ads by query: /api/byQuery?query=[query]&count=[count]&lang=[lang]</li>" \
                "</ul>"
 
     @app.route('/api/all', methods=['GET'])
@@ -34,6 +39,20 @@ def start():
         else:
             return "Error: No id field provided. Please specify an id."
         return jsonify(adsService.getById(adId).__repr__())
+
+    @app.route('/api/image/byId', methods=['GET'])
+    def imageById():
+        if 'id' in request.args:
+            adId = int(request.args['id'])
+        else:
+            return "Error: No id field provided. Please specify an id."
+        ad = adsService.getById(adId)
+        if ad:
+            img = imageService.getImage(ad.imagePath)
+            _, encoded_img = cv2.imencode('.PNG', img)
+            encoded_img = base64.b64encode(encoded_img)
+            return encoded_img
+        return None
 
     @app.route('/api/byQuery', methods=['GET'])
     def byQuery():
