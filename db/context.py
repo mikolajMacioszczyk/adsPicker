@@ -68,8 +68,8 @@ class Context:
 
     def _unhookTag(self, tag):
         tag.unUse()
-        if tag.useCount == 0:
-            self.session.query(ad_tags_association).filter(tag_id=tag.id).delete()
+        if tag.useCount <= 0:
+            self.session.query(ad_tags_association).filter_by(tag_id=tag.id).delete()
             self.session.commit()
             self.session.delete(tag)
 

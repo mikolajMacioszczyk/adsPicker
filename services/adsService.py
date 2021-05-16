@@ -21,6 +21,9 @@ class AdsService:
         updated = Ad(title, description, imagePath, tags)
         return self.__context.updateAd(adId, updated)
 
+    def remove(self, adId):
+        return self.__context.removeAd(adId)
+
     def getByTags(self, query, maxCount=1, language='pl', useGlove=False):
         words = self._getMeaningfulWords(query.lower(), language)
         if useGlove:
