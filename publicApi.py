@@ -30,7 +30,9 @@ def start():
             count = int(request.args['count'])
         else:
             count = 100
-        return jsonify([ad.__repr__() for ad in adsService.getAny(count)])
+        response = jsonify([ad.__repr__() for ad in adsService.getAny(count)])
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        return response
 
     @app.route('/api/byId', methods=['GET'])
     def byId():
@@ -38,7 +40,9 @@ def start():
             adId = int(request.args['id'])
         else:
             return "Error: No id field provided. Please specify an id."
-        return jsonify(adsService.getById(adId).__repr__())
+        response = jsonify(adsService.getById(adId).__repr__())
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        return response
 
     @app.route('/api/image/byId', methods=['GET'])
     def imageById():
@@ -69,7 +73,9 @@ def start():
         else:
             lang = 'pl'
 
-        return jsonify([ad.__repr__() for ad in adsService.getByTags(query, count, lang)])
+        response = jsonify([ad.__repr__() for ad in adsService.getByTags(query, count, lang)])
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        return response
 
     app.run()
 

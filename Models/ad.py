@@ -2,6 +2,7 @@ from db.base import Base
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 from Models.ad_tags import ad_tags_association
+from Models.tag import Tag
 
 
 class Ad(Base):
@@ -22,7 +23,7 @@ class Ad(Base):
 
     @classmethod
     def default(cls):
-        return Ad('title', 'description', 'path', ['tag'])
+        return Ad('title', 'description', 'path', [Tag('tag')])
 
     def adTag(self, tag):
         if tag not in self.tags:
