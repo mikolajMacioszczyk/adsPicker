@@ -5,10 +5,12 @@ from services.imageService import ImageService
 from db.context import Context
 import cv2
 import base64
+from flask_cors import CORS
 
 
 def start():
     app = flask.Flask(__name__)
+    CORS(app)
     app.config['DEBUG'] = True
     adsService = AdsService(Context())
     imageService = ImageService()
@@ -20,6 +22,7 @@ def start():
                "<li>home: /</li>" \
                "<li>all ads: /api/all?count=[count]</li>" \
                "<li>ad by Id: /api/byId?id=[id]</li>" \
+               "<li>update ad: /api/update?id=[id]</li>" \
                "<li>ad image by id: /api/image/byId?id=[id]</li>" \
                "<li>ads by query: /api/byQuery?query=[query]&count=[count]&lang=[lang]</li>" \
                "</ul>"
@@ -31,7 +34,6 @@ def start():
         else:
             count = 100
         response = jsonify([ad.__repr__() for ad in adsService.getAny(count)])
-        response.headers.add("Access-Control-Allow-Origin", "*")
         return response
 
     @app.route('/api/byId', methods=['GET'])
@@ -41,7 +43,17 @@ def start():
         else:
             return "Error: No id field provided. Please specify an id."
         response = jsonify(adsService.getById(adId).__repr__())
-        response.headers.add("Access-Control-Allow-Origin", "*")
+        return response
+
+    @app.route('/api/update', methods=['POST'])
+    def updateAd():
+        if 'id' in request.args:
+            adId = int(request.args['id'])
+        else:
+            return "Error: No id field provided. Please specify an id."
+        title, description = request.json.get('title'), request.json.get('description')
+        imagePath, tags = request.json.get('imagePath'), request.json.get('tags')
+        response = jsonify(adsService.update(adId, title, description, imagePath, tags).__repr__())
         return response
 
     @app.route('/api/image/byId', methods=['GET'])
@@ -74,7 +86,6 @@ def start():
             lang = 'pl'
 
         response = jsonify([ad.__repr__() for ad in adsService.getByTags(query, count, lang)])
-        response.headers.add("Access-Control-Allow-Origin", "*")
         return response
 
     app.run()

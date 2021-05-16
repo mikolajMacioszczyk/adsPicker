@@ -41,7 +41,7 @@ class Context:
             return None
         fromDb.update(updated)
         for i in range(0, len(fromDb.tags)):
-            self.updateAd(fromDb, i)
+            self._updateTag(fromDb, i)
         self.session.commit()
         return fromDb
 
@@ -77,7 +77,7 @@ class Context:
         return self.session.query(Tag).get(tagId)
 
     def getTagByValue(self, value):
-        return self.session.query(Tag).filter_by(value=value).one_or_none()
+        return self.session.query(Tag).filter_by(value=value).first()
 
     def addTag(self, tag):
         self.session.add(tag)

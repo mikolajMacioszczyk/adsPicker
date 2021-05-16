@@ -17,8 +17,11 @@ class Ad(Base):
         self.title = title
         self.description = description
         self.imagePath = imagePath
-        for tag in tags:
-            tag.use()
+        if tags is None:
+            tags = []
+        else:
+            for tag in tags:
+                tag.use()
         self.tags = tags
 
     @classmethod

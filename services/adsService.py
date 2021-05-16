@@ -1,4 +1,5 @@
 from Models.ad import Ad
+from Models.tag import Tag
 from spacy.lang.pl import Polish
 from spacy.lang.en import English
 from nltk.stem import PorterStemmer
@@ -14,6 +15,11 @@ class AdsService:
 
     def getByTitle(self, title):
         return self.__context.getAdByTitle(title)
+
+    def update(self, adId, title, description, imagePath, tagsList):
+        tags = [Tag(tag['value']) for tag in tagsList]
+        updated = Ad(title, description, imagePath, tags)
+        return self.__context.updateAd(adId, updated)
 
     def getByTags(self, query, maxCount=1, language='pl', useGlove=False):
         words = self._getMeaningfulWords(query.lower(), language)
