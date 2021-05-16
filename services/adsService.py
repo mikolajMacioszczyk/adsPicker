@@ -16,10 +16,17 @@ class AdsService:
     def getByTitle(self, title):
         return self.__context.getAdByTitle(title)
 
+    def create(self, title, description, imagePath, tagsList):
+        created = Ad(title, description, imagePath, self._tagsFromList(tagsList))
+        return self.__context.addAd(created)
+
     def update(self, adId, title, description, imagePath, tagsList):
-        tags = [Tag(tag['value']) for tag in tagsList]
-        updated = Ad(title, description, imagePath, tags)
+        updated = Ad(title, description, imagePath, self._tagsFromList(tagsList))
         return self.__context.updateAd(adId, updated)
+
+    @staticmethod
+    def _tagsFromList(tagsList):
+        return [Tag(tag['value']) for tag in tagsList]
 
     def remove(self, adId):
         return self.__context.removeAd(adId)

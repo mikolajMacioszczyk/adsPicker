@@ -22,6 +22,7 @@ def start():
                "<li>home: /</li>" \
                "<li>all ads: /api/all?count=[count]</li>" \
                "<li>ad by Id: /api/byId?id=[id]</li>" \
+               "<li>create ad: /api/create</li>" \
                "<li>update ad: /api/update?id=[id]</li>" \
                "<li>remove ad: /api/remove?id=[id]</li>" \
                "<li>ad image by id: /api/image/byId?id=[id]</li>" \
@@ -44,6 +45,13 @@ def start():
         else:
             return "Error: No id field provided. Please specify an id."
         response = jsonify(adsService.getById(adId).__repr__())
+        return response
+
+    @app.route('/api/create', methods=['POST'])
+    def createAd():
+        title, description = request.json.get('title'), request.json.get('description')
+        imagePath, tags = request.json.get('imagePath'), request.json.get('tags')
+        response = jsonify(adsService.create(title, description, imagePath, tags))
         return response
 
     @app.route('/api/update', methods=['POST'])

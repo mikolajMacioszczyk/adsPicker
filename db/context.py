@@ -2,6 +2,7 @@ from Models.ad import Ad
 from Models.tag import Tag
 from Models.ad_tags import ad_tags_association
 from db.base import Base, Session, engine
+from sqlalchemy import exc
 
 
 class Context:
@@ -28,9 +29,13 @@ class Context:
                 ad.tags[i].unUse()
                 ad.tags[i] = fromDb
                 fromDb.use()
-        self.session.commit()
-        self.session.add(ad)
-        self.session.commit()
+        try:
+            self.session.commit()
+            self.session.add(ad)
+            self.session.commit()
+            return True
+        except exc.SQLAlchemyError:
+            return False
 
     def getAds(self, limit, offset=0):
         return self.session.query(Ad).limit(limit).offset(offset).all()
