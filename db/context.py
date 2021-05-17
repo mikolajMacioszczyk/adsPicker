@@ -33,9 +33,9 @@ class Context:
             self.session.commit()
             self.session.add(ad)
             self.session.commit()
-            return True
+            return ad
         except exc.SQLAlchemyError:
-            return False
+            return None
 
     def getAds(self, limit, offset=0):
         return self.session.query(Ad).limit(limit).offset(offset).all()

@@ -25,6 +25,7 @@ def start():
                "<li>create ad: /api/create</li>" \
                "<li>update ad: /api/update?id=[id]</li>" \
                "<li>remove ad: /api/remove?id=[id]</li>" \
+               "<li>upload image: /api/image/upload</li>" \
                "<li>ad image by id: /api/image/byId?id=[id]</li>" \
                "<li>ads by query: /api/byQuery?query=[query]&count=[count]&lang=[lang]</li>" \
                "</ul>"
@@ -51,7 +52,7 @@ def start():
     def createAd():
         title, description = request.json.get('title'), request.json.get('description')
         imagePath, tags = request.json.get('imagePath'), request.json.get('tags')
-        response = jsonify(adsService.create(title, description, imagePath, tags))
+        response = jsonify(adsService.create(title, description, imagePath, tags).__repr__())
         return response
 
     @app.route('/api/update', methods=['POST'])
@@ -73,6 +74,22 @@ def start():
             return "Error: No id field provided. Please specify an id."
         response = jsonify(adsService.remove(adId))
         return response
+
+    @app.route('/api/image/upload', methods=['POST'])
+    def uploadImage():
+        image = request.files['image']
+        path = request.host_url + "api/image?path=" + imageService.saveFileStorage(image)
+        response = jsonify(path)
+        return response
+
+    @app.route('/api/image', methods=['GET'])
+    def getImage():
+        if 'path' in request.args:
+            path = request.args['path']
+        else:
+            return "Error: No path field provided. Please specify an path."
+        res = imageService.downloadToFlask(path)
+        return res
 
     @app.route('/api/image/byId', methods=['GET'])
     def imageById():
