@@ -26,7 +26,8 @@ class AdsService:
 
     @staticmethod
     def _tagsFromList(tagsList):
-        return [Tag(tag['value']) for tag in tagsList]
+        ps = PorterStemmer()
+        return [Tag(ps.stem(tag['value'])) for tag in tagsList]
 
     def remove(self, adId):
         return self.__context.removeAd(adId)
@@ -51,7 +52,7 @@ class AdsService:
                     results[ad] = 1
                 else:
                     results[ad] += 1
-        return sorted(results.items(), key=lambda kv: kv[1])
+        return sorted(results.items(), key=lambda kv: kv[1], reverse=True)
 
     @staticmethod
     def _getMeaningfulWords(query, language):
