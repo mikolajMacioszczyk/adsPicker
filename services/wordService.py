@@ -1,7 +1,7 @@
 import numpy as np
 from scipy import spatial
 
-GLOVE_MODEL_FILENAME = 'glove.6B.300d.txt'
+GLOVE_MODEL_FILENAME = 'glove.6B.100d.txt'
 
 
 class WordService:

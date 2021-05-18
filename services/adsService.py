@@ -5,7 +5,7 @@ from spacy.lang.en import English
 # from nltk.stem import PorterStemmer
 import re
 
-SIMILAR_COUNT = 10
+SIMILAR_COUNT = 5
 
 
 class AdsService:
@@ -31,7 +31,7 @@ class AdsService:
     def _tagsFromList(tagsList):
         # ps = PorterStemmer()
         # return [Tag(ps.stem(tag['value'])) for tag in tagsList]
-        return [Tag(tag['value']) for tag in tagsList]
+        return [Tag(tag['value']) for tag in sorted(tagsList, key=lambda t: t['value'])]
 
     def remove(self, adId):
         return self.__context.removeAd(adId)
