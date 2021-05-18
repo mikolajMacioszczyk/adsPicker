@@ -2,7 +2,7 @@ from Models.ad import Ad
 from Models.tag import Tag
 from spacy.lang.pl import Polish
 from spacy.lang.en import English
-from nltk.stem import PorterStemmer
+# from nltk.stem import PorterStemmer
 import re
 
 SIMILAR_COUNT = 10
@@ -29,8 +29,9 @@ class AdsService:
 
     @staticmethod
     def _tagsFromList(tagsList):
-        ps = PorterStemmer()
-        return [Tag(ps.stem(tag['value'])) for tag in tagsList]
+        # ps = PorterStemmer()
+        # return [Tag(ps.stem(tag['value'])) for tag in tagsList]
+        return [Tag(tag['value']) for tag in tagsList]
 
     def remove(self, adId):
         return self.__context.removeAd(adId)
@@ -47,7 +48,7 @@ class AdsService:
         results = {}
         for word in words:
             similarGroup = self.__wordService.findClosest(word)
-            print(f"similar group for word {word}: ", str(similarGroup))
+            print(f"\033[92m similar group for word {word}: {str(similarGroup)}\033[0m")
             for similar in similarGroup:
                 for ad in self.__context.getAdsByTags([similar]):
                     if ad not in results:
@@ -66,14 +67,15 @@ class AdsService:
             raise ValueError(f'unsupported language {language}')
 
         query = re.sub(r'[^\w\s]', '', query)
-        ps = PorterStemmer()
+        # ps = PorterStemmer()
 
         token_list = [token.text for token in nlp(query)]
         filtered_query = []
         for word in token_list:
             lexeme = nlp.vocab[word]
             if not lexeme.is_stop:
-                filtered_query.append(ps.stem(word))
+                # filtered_query.append(ps.stem(word))
+                filtered_query.append(word)
         return filtered_query
 
     def getAny(self, maxCount=1):
