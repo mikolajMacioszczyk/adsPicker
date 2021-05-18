@@ -6,13 +6,15 @@ from db.context import Context
 import cv2
 import base64
 from flask_cors import CORS
+from services.wordService import WordService
 
 
 def start():
     app = flask.Flask(__name__)
     CORS(app)
     app.config['DEBUG'] = True
-    adsService = AdsService(Context())
+    wordService = WordService()
+    adsService = AdsService(Context(), wordService)
     imageService = ImageService()
 
     @app.route('/', methods=['GET'])

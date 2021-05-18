@@ -5,9 +5,12 @@ from spacy.lang.en import English
 from nltk.stem import PorterStemmer
 import re
 
+SIMILAR_COUNT = 10
+
 
 class AdsService:
-    def __init__(self, context):
+    def __init__(self, context, wordService):
+        self.__wordService = wordService
         self.__context = context
 
     def getById(self, adId):
@@ -32,26 +35,25 @@ class AdsService:
     def remove(self, adId):
         return self.__context.removeAd(adId)
 
-    def getByTags(self, query, maxCount=1, language='pl', useGlove=False):
+    def getByTags(self, query, maxCount=1, language='pl'):
         words = self._getMeaningfulWords(query.lower(), language)
-        if useGlove:
-            #TODO: Implement
-            raise NotImplemented()
+        results = self._countMatches(words)
+        if results:
+            return [res[0] for res in results[:maxCount]]
         else:
-            results = self._countMatches(words)
-            if results:
-                return [res[0] for res in results[:maxCount]]
-            else:
-                return self.getAny(maxCount)
+            return self.getAny(maxCount)
 
     def _countMatches(self, words):
         results = {}
         for word in words:
-            for ad in self.__context.getAdsByTags([word]):
-                if ad not in results:
-                    results[ad] = 1
-                else:
-                    results[ad] += 1
+            similarGroup = self.__wordService.findClosest(word)
+            print(f"similar group for word {word}: ", str(similarGroup))
+            for similar in similarGroup:
+                for ad in self.__context.getAdsByTags([similar]):
+                    if ad not in results:
+                        results[ad] = 1
+                    else:
+                        results[ad] += 1
         return sorted(results.items(), key=lambda kv: kv[1], reverse=True)
 
     @staticmethod

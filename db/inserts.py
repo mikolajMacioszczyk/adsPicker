@@ -42,13 +42,13 @@ sushiTags = ['oriental', 'orientalna', 'ryba', 'fish', 'raw', 'surowa', 'ryż', 
 adsService.create('Sushi', 'Sushi z łososia, fast-food', 'http://127.0.0.1:5000/api/image?path=sushi.jpg', [{'value': tag} for tag in sushiTags])
 
 #polish
-bigosTags = ['polish', 'dinner', 'obiad', 'kurczak', 'kapusta', 'cabbage', 'mięso', 'mean', 'grzyby', 'mushrooms']
+bigosTags = ['polish', 'dinner', 'obiad', 'kurczak', 'kapusta', 'cabbage', 'mięso', 'meat', 'grzyby', 'mushrooms']
 adsService.create('Bigos', 'Bigos polski, danie główne', 'http://127.0.0.1:5000/api/image?path=bigos.jpg', [{'value': tag} for tag in bigosTags])
 bunTags = ['polish', 'drożdżówka', 'bun', 'sweet', 'słodkie', 'mak', 'poppy', 'pieczywo', 'baking', 'deser', 'dessert']
 adsService.create('Drożdżówka', 'drożdżówka z makiem, danie deserowe', 'http://127.0.0.1:5000/api/image?path=drozdzowka.jpg', [{'value': tag} for tag in bunTags])
 hoovesTags = ['polish', 'kopytka', 'hooves', 'dinner', 'obiad', 'kluski', 'noodles', 'tłuste', 'fat']
 adsService.create('Kopytka', 'Kopytka ze skwarkami, danie główne', 'http://127.0.0.1:5000/api/image?path=kopytka.jpg', [{'value': tag} for tag in hoovesTags])
-dumplingsTags = ['polish', 'pierogi', 'ruskie', 'dumplings', 'ser', 'cheese', 'zmiemniaki', 'potatoes', 'dinner', 'obiad']
+dumplingsTags = ['polish', 'pierogi', 'ruskie', 'dumplings', 'ser', 'cheese', 'ziemniaki', 'potatoes', 'dinner', 'obiad']
 adsService.create('Pierogi ruskie', 'Pierogi ruskie, danie główne', 'http://127.0.0.1:5000/api/image?path=pierogi.jpg', [{'value': tag} for tag in dumplingsTags])
 porkChopTags = ['polish', 'schabowy', 'kotlet', 'pork', 'chop', 'meat', 'mięso', 'wieprzowina', 'dinner', 'obiad']
 adsService.create('Kotlet schabowy', 'Kotlet schabowy, danie główne', 'http://127.0.0.1:5000/api/image?path=schabowy.jpg', [{'value': tag} for tag in porkChopTags])
