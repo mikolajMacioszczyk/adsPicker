@@ -1,7 +1,7 @@
 import numpy as np
 from scipy import spatial
 
-GLOVE_MODEL_FILENAME = 'glove.6B.100d.txt'
+GLOVE_MODEL_FILENAME = 'glove.6B.50d.txt'
 
 
 class WordService:
@@ -17,10 +17,12 @@ class WordService:
                 vector = np.asarray(values[1:], "float32")
                 self._embeddings_dict[word] = vector
 
-    def findClosest(self, typedWord, count=10):
+    def findClosest(self, typedWord, count=5):
         if typedWord in self._embeddings_dict:
             embedding = self._embeddings_dict[typedWord]
-            similar = sorted(self._embeddings_dict.keys(), key=lambda word: spatial.distance.euclidean(self._embeddings_dict[word], embedding))
+            similar = sorted(self._embeddings_dict.keys(), key=lambda word: spatial.distance.euclidean(self._embeddings_dict[word], embedding))[:count]
+            print(f"\033[92m similar group for word {typedWord}: {str(similar)}\033[0m")
         else:
+            print(f"\033[91m could not find similar group for word {typedWord} \033[0m")
             similar = [typedWord]
-        return similar[:count]
+        return similar

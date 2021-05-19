@@ -19,10 +19,12 @@ adsService.create('Pancakes', 'Naleśniki amerykańskie z miodem - danie śniada
 # breakfast
 scrambledEggsTags = ['breakfast', 'śniadanie', 'fast', 'eggs', 'jajka', 'jajecznica', 'scrambled',  'hot', 'ciepło', 'onion', 'cebula']
 adsService.create('Jajecznica', 'Jajecznica z patelni, danie śniadaniowe', 'http://127.0.0.1:5000/api/image?path=jajecznica.jpg', [{'value': tag} for tag in scrambledEggsTags])
-sandwichesTags = ['breakfast', 'śniadanie', 'kanapki', 'sandwiches', 'pieczywo', 'bread', 'błonnik', 'fiber', 'świeże', 'fresh', 'vegetables', 'warzywa', 'pieczywo', 'baking', 'cold', 'zimno']
-adsService.create('Kanapki', 'Kanaki wiosenne, danie śniadaniowe', 'http://127.0.0.1:5000/api/image?path=kanapki.jpg', [{'value': tag} for tag in sandwichesTags])
+sandwichesTags = ['breakfast', 'śniadanie', 'kanapki', 'sandwiches', 'pieczywo', 'bread', 'błonnik', 'fiber', 'vegan', 'wegetariańskie', 'świeże', 'fresh', 'vegetables', 'warzywa', 'pieczywo', 'baking']
+adsService.create('Kanapki', 'Kanaki wiosenne, danie śniadaniowe', 'http://127.0.0.1:5000/api/image?path=kanapki.webp', [{'value': tag} for tag in sandwichesTags])
 bananaPancakesTags = ['breakfast', 'śniadanie', 'naleśniki', 'pancakes', 'banan', 'banana', 'marmolada', 'marmalade', 'sweet', 'słodkie', 'vegan']
 adsService.create('Naleśniki', 'Plaski bananowe z marmoladą, danie śniadaniowe', 'http://127.0.0.1:5000/api/image?path=naleśniki.jpg', [{'value': tag} for tag in bananaPancakesTags])
+applePieTags = ['deser', 'dessert', 'apple', 'jabłko', 'pie', 'ciasto', 'ciepło', 'hot', 'słodkie', 'sweet', 'wypiek', 'baking']
+adsService.create('Szarlotka', 'Szarlotka na ciepło, danie deserowe', 'http://127.0.0.1:5000/api/image?path=szarlotka.jpg', [{'value': tag} for tag in applePieTags])
 
 # italian
 toscanChickenTags = ['dinner', 'obiad', 'italian', 'włoska', 'kurczak', 'chicken', 'sos', 'sauce', 'meat', 'mięso', 'główne', 'main', 'krem', 'creme', 'pomidory', 'tomatoes', 'hot', 'ciepło']

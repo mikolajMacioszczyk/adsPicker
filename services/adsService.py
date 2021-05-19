@@ -40,22 +40,23 @@ class AdsService:
         words = self._getMeaningfulWords(query.lower(), language)
         results = self._countMatches(words)
         if results:
-            return [res[0] for res in results[:maxCount]]
+            return results[:maxCount]
         else:
             return self.getAny(maxCount)
 
     def _countMatches(self, words):
         results = {}
+        adIdToAdMapping = {}
         for word in words:
-            similarGroup = self.__wordService.findClosest(word)
-            print(f"\033[92m similar group for word {word}: {str(similarGroup)}\033[0m")
-            for similar in similarGroup:
-                for ad in self.__context.getAdsByTags([similar]):
-                    if ad not in results:
-                        results[ad] = 1
-                    else:
-                        results[ad] += 1
-        return sorted(results.items(), key=lambda kv: kv[1], reverse=True)
+            similarGroup = self.__wordService.findClosest(word, SIMILAR_COUNT)
+            for ad in self.__context.getAdsByTags(similarGroup):
+                if ad.id not in results:
+                    results[ad.id] = 1
+                    adIdToAdMapping[ad.id] = ad
+                else:
+                    results[ad.id] += 1
+        sortedByVal = sorted(results.items(), key=lambda kv: kv[1], reverse=True)
+        return [adIdToAdMapping[adId] for adId, _ in sortedByVal]
 
     @staticmethod
     def _getMeaningfulWords(query, language):
