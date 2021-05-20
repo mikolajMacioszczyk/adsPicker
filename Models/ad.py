@@ -1,7 +1,7 @@
 from db.base import Base
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
-from Models.ad_tags import ad_tags_association
+from Models.ad_tags import ad_tags_association, hidden_ad_tags_association
 from Models.tag import Tag
 
 
@@ -12,36 +12,42 @@ class Ad(Base):
     description = Column('description', String(1024))
     imagePath = Column('imagePath', String(128))
     tags = relationship("Tag", secondary=ad_tags_association)
+    hiddenTags = relationship("Tag", secondary=hidden_ad_tags_association)
 
-    def __init__(self, title, description, imagePath, tags=[]):
+    def __init__(self, title, description, imagePath, tags, hiddenTags):
         self.title = title
         self.description = description
         self.imagePath = imagePath
+        self.tags = self._assignNotNone(tags)
+        self.hiddenTags = self._assignNotNone(hiddenTags)
+
+    @staticmethod
+    def _assignNotNone(tags):
         if tags is None:
-            tags = []
+            return []
         else:
             for tag in tags:
                 tag.use()
-        self.tags = tags
+            return tags
+
+    @staticmethod
+    def _reAssignNotNone(oldTags, newTags):
+        for tag in oldTags:
+            tag.unUse()
+        for tag in newTags:
+            tag.use()
+        return newTags
 
     @classmethod
     def default(cls):
-        return Ad('title', 'description', 'path', [Tag('tag')])
-
-    def adTag(self, tag):
-        if tag not in self.tags:
-            tag.use()
-            self.tags.append(tag)
+        return Ad('title', 'description', 'path', [Tag('tag')], [Tag('tag')])
 
     def update(self, updated):
         self.title = updated.title
         self.description = updated.description
         self.imagePath = updated.imagePath
-        for tag in self.tags:
-            tag.unUse()
-        for tag in updated.tags:
-            tag.use()
-        self.tags = updated.tags
+        self.tags = self._reAssignNotNone(self.tags, updated.tags)
+        self.hiddenTags = self._reAssignNotNone(self.hiddenTags, updated.hiddenTags)
 
     def __repr__(self):
         return {'id': self.id, 'title': self.title, 'description': self.description, 'imagePath': self.imagePath, 'tags': [tag.__repr__() for tag in self.tags]}

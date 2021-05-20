@@ -1,12 +1,12 @@
 from db.base import Base, Session, engine
 from db.context import Context
 from services.adsService import AdsService
-
+from services.wordService import WordService
 
 Base.metadata.create_all(engine)
 session = Session()
 
-adsService = AdsService(Context(), [])
+adsService = AdsService(Context(), WordService())
 
 # american
 burgerTags = ['fast-food', 'fast', 'burger', 'american', 'amerykańska', 'meat', 'mięso', 'beef', 'wołowina', 'loaf', 'bułka', 'dinner', 'obiad', 'tłuste', 'fat', 'hot', 'ciepło']

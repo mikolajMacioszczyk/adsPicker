@@ -20,18 +20,28 @@ class AdsService:
         return self.__context.getAdByTitle(title)
 
     def create(self, title, description, imagePath, tagsList):
-        created = Ad(title, description, imagePath, self._tagsFromList(tagsList))
+        created = self._createAdWithTags(title, description, imagePath, tagsList)
         return self.__context.addAd(created)
 
     def update(self, adId, title, description, imagePath, tagsList):
-        updated = Ad(title, description, imagePath, self._tagsFromList(tagsList))
+        updated = self._createAdWithTags(title, description, imagePath, tagsList)
         return self.__context.updateAd(adId, updated)
 
+    def _createAdWithTags(self, title, description, imagePath, tagsList):
+        allSimilar = set()
+        for tag in tagsList:
+            similar = self.__wordService.findClosest(tag['value'])
+            allSimilar.update(similar)
+        return Ad(title, description, imagePath, self._tagsFromList(tagsList, True), self._tagsFromList(allSimilar))
+
     @staticmethod
-    def _tagsFromList(tagsList):
+    def _tagsFromList(tagsList, isWrapped=False):
         # ps = PorterStemmer()
         # return [Tag(ps.stem(tag['value'])) for tag in tagsList]
-        return [Tag(tag['value']) for tag in sorted(tagsList, key=lambda t: t['value'])]
+        if isWrapped:
+            return [Tag(tag['value']) for tag in sorted(tagsList, key=lambda t: t['value'])]
+        else:
+            return [Tag(tag) for tag in sorted(tagsList, key=lambda t: t)]
 
     def remove(self, adId):
         return self.__context.removeAd(adId)
@@ -48,8 +58,7 @@ class AdsService:
         results = {}
         adIdToAdMapping = {}
         for word in words:
-            similarGroup = self.__wordService.findClosest(word, SIMILAR_COUNT)
-            for ad in self.__context.getAdsByTags(similarGroup):
+            for ad in self.__context.getAdsByTags([word]):
                 if ad.id not in results:
                     results[ad.id] = 1
                     adIdToAdMapping[ad.id] = ad

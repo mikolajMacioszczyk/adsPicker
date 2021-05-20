@@ -1,6 +1,6 @@
 from Models.ad import Ad
 from Models.tag import Tag
-from Models.ad_tags import ad_tags_association
+from Models.ad_tags import ad_tags_association, hidden_ad_tags_association
 from db.base import Base, Session, engine
 from sqlalchemy import exc
 
@@ -17,7 +17,7 @@ class Context:
         return self.session.query(Ad).filter_by(title=title).one_or_none()
 
     def getAdsByTags(self, tags):
-        return self.session.query(Ad).filter(Ad.tags.any(Tag.value.in_(tags))).all()
+        return self.session.query(Ad).filter(Ad.hiddenTags.any(Tag.value.in_(tags))).all()
 
     def addAd(self, ad):
         for i in range(0, len(ad.tags)):
@@ -28,6 +28,15 @@ class Context:
             else:
                 ad.tags[i].unUse()
                 ad.tags[i] = fromDb
+                fromDb.use()
+        for i in range(0, len(ad.hiddenTags)):
+            tag = ad.hiddenTags[i]
+            fromDb = self.getTagByValue(tag.value)
+            if fromDb is None:
+                self.session.add(tag)
+            else:
+                ad.hiddenTags[i].unUse()
+                ad.hiddenTags[i] = fromDb
                 fromDb.use()
         try:
             self.session.commit()
@@ -47,17 +56,26 @@ class Context:
         fromDb.update(updated)
         for i in range(0, len(fromDb.tags)):
             self._updateTag(fromDb, i)
+        for i in range(0, len(fromDb.hiddenTags)):
+            self._updateTag(fromDb, i, True)
         self.session.commit()
         return fromDb
 
-    def _updateTag(self, ad, index):
-        tag = ad.tags[index]
+    def _updateTag(self, ad, index, hidden=False):
+        if hidden:
+            tag = ad.hiddenTags[index]
+        else:
+            tag = ad.tags[index]
         tagFromDb = self.getTagByValue(tag.value)
         if tagFromDb is None:
             self.session.add(tag)
         else:
-            ad.tags[index].unUse()
-            ad.tags[index] = tagFromDb
+            if hidden:
+                ad.hiddenTags[index].unUse()
+                ad.hiddenTags[index] = tagFromDb
+            else:
+                ad.tags[index].unUse()
+                ad.tags[index] = tagFromDb
             tagFromDb.use()
 
     def removeAd(self, adId):
@@ -66,15 +84,20 @@ class Context:
             return False
         for tag in fromDb.tags:
             self._unhookTag(tag)
+        for tag in fromDb.hiddenTags:
+            self._unhookTag(tag, True)
         self.session.commit()
         self.session.delete(fromDb)
         self.session.commit()
         return True
 
-    def _unhookTag(self, tag):
+    def _unhookTag(self, tag, hidden=False):
         tag.unUse()
         if tag.useCount <= 0:
-            self.session.query(ad_tags_association).filter_by(tag_id=tag.id).delete()
+            if hidden:
+                self.session.query(hidden_ad_tags_association).filter_by(tag_id=tag.id).delete()
+            else:
+                self.session.query(ad_tags_association).filter_by(tag_id=tag.id).delete()
             self.session.commit()
             self.session.delete(tag)
 
@@ -93,4 +116,3 @@ class Context:
             self.session.close()
         except AttributeError as err:
             print(err)
-

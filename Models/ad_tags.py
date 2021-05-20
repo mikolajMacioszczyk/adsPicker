@@ -5,3 +5,8 @@ from db.base import Base
 ad_tags_association = Table('ad_tags', Base.metadata,
                             Column('ad_id', Integer, ForeignKey('ads.id')),
                             Column('tag_id', Integer, ForeignKey('tags.id')))
+
+
+hidden_ad_tags_association = Table('ad_tags_configured', Base.metadata,
+                            Column('ad_id', Integer, ForeignKey('ads.id')),
+                            Column('tag_id', Integer, ForeignKey('tags.id')))
