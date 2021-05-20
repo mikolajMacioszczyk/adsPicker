@@ -2,7 +2,7 @@ from Models.ad import Ad
 from Models.tag import Tag
 from spacy.lang.pl import Polish
 from spacy.lang.en import English
-# from nltk.stem import PorterStemmer
+import stanza
 import re
 
 SIMILAR_COUNT = 5
@@ -12,6 +12,8 @@ class AdsService:
     def __init__(self, context, wordService):
         self.__wordService = wordService
         self.__context = context
+        # stanza.download('en')
+        stanza.download('pl')
 
     def getById(self, adId):
         return self.__context.getAdById(adId)
@@ -36,8 +38,6 @@ class AdsService:
 
     @staticmethod
     def _tagsFromList(tagsList, isWrapped=False):
-        # ps = PorterStemmer()
-        # return [Tag(ps.stem(tag['value'])) for tag in tagsList]
         if isWrapped:
             return [Tag(tag['value']) for tag in sorted(tagsList, key=lambda t: t['value'])]
         else:
@@ -71,13 +71,18 @@ class AdsService:
     def _getMeaningfulWords(query, language):
         if language == 'pl':
             nlp = Polish()
+            stanza_nlp = stanza.Pipeline(lang='pl', processors='tokenize,mwt,pos,lemma')
         elif language == 'en':
             nlp = English()
+            stanza_nlp = stanza.Pipeline(lang='en', processors='tokenize,mwt,pos,lemma')
         else:
             raise ValueError(f'unsupported language {language}')
 
-        query = re.sub(r'[^\w\s]', '', query)
-        # ps = PorterStemmer()
+        # pl?
+        doc = stanza_nlp(query)
+
+        lemmatized = [word.lemma for sent in doc.sentences for word in sent.words]
+        query = re.sub(r'[^\w\s]', '', ' '.join(lemmatized))
 
         token_list = [token.text for token in nlp(query)]
         filtered_query = []
