@@ -13,7 +13,7 @@ class AdsService:
         self.__wordService = wordService
         self.__context = context
         # stanza.download('en')
-        stanza.download('pl')
+        # stanza.download('pl')
 
     def getById(self, adId):
         return self.__context.getAdById(adId)
@@ -32,9 +32,22 @@ class AdsService:
     def _createAdWithTags(self, title, description, imagePath, tagsList):
         allSimilar = set()
         for tag in tagsList:
-            similar = self.__wordService.findClosest(tag['value'])
+            value = self._lematize(tag['value'], tag['lang'])
+            similar = self.__wordService.findClosest(value)
             allSimilar.update(similar)
         return Ad(title, description, imagePath, self._tagsFromList(tagsList, True), self._tagsFromList(allSimilar))
+
+    @staticmethod
+    def _lematize(text, lang):
+        if lang == 'pl':
+            stanza_nlp = stanza.Pipeline(lang='pl', processors='tokenize,mwt,pos,lemma')
+        elif lang == 'en':
+            stanza_nlp = stanza.Pipeline(lang='en', processors='tokenize,mwt,pos,lemma')
+        else:
+            raise ValueError(f'unsupported language {lang}')
+        doc = stanza_nlp(text)
+        lemmatized = [word.lemma for sent in doc.sentences for word in sent.words]
+        return re.sub(r'[^\w\s]', '', ' '.join(lemmatized))
 
     @staticmethod
     def _tagsFromList(tagsList, isWrapped=False):
@@ -71,18 +84,12 @@ class AdsService:
     def _getMeaningfulWords(query, language):
         if language == 'pl':
             nlp = Polish()
-            stanza_nlp = stanza.Pipeline(lang='pl', processors='tokenize,mwt,pos,lemma')
         elif language == 'en':
             nlp = English()
-            stanza_nlp = stanza.Pipeline(lang='en', processors='tokenize,mwt,pos,lemma')
         else:
             raise ValueError(f'unsupported language {language}')
 
-        # pl?
-        doc = stanza_nlp(query)
-
-        lemmatized = [word.lemma for sent in doc.sentences for word in sent.words]
-        query = re.sub(r'[^\w\s]', '', ' '.join(lemmatized))
+        query = AdsService._lematize(query, language)
 
         token_list = [token.text for token in nlp(query)]
         filtered_query = []
