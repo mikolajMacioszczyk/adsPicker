@@ -77,7 +77,7 @@ adsService.create('Sushi', 'Sushi z łososia, fast-food', 'http://127.0.0.1:5000
                   [{'value': tag[0], 'lang': tag[1]} for tag in sushiTags])
 
 #polish
-bigosTags = [('polish', 'en'), ('dinner', 'en'), ('obiad', 'pl'), ('kurczak', 'pl'), ('kapusta', 'pl'), ('cabbage', 'en'), ('mięso', 'pl'),
+bigosTags = [('polish', 'en'), ('polska', 'pl'),  ('dinner', 'en'), ('obiad', 'pl'), ('kurczak', 'pl'), ('kapusta', 'pl'), ('cabbage', 'en'), ('mięso', 'pl'),
              ('meat', 'en'), ('grzyby', 'pl'), ('mushrooms', 'en'), ('hot', 'en'), ('ciepło', 'pl'), ('appetizer', 'en'), ('przystawka', 'pl')]
 adsService.create('Bigos', 'Bigos polski, danie główne', 'http://127.0.0.1:5000/api/image?path=bigos.jpg',
                   [{'value': tag[0], 'lang': tag[1]} for tag in bigosTags])
