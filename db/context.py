@@ -20,30 +20,14 @@ class Context:
         return self.session.query(Ad).filter(Ad.hiddenTags.any(Tag.value.in_(tags))).all()
 
     def addAd(self, ad):
-        for i in range(0, len(ad.tags)):
-            tag = ad.tags[i]
-            fromDb = self.getTagByValue(tag.value)
-            if fromDb is None:
-                self.session.add(tag)
-            else:
-                ad.tags[i].unUse()
-                ad.tags[i] = fromDb
-                fromDb.use()
-        for i in range(0, len(ad.hiddenTags)):
-            tag = ad.hiddenTags[i]
-            fromDb = self.getTagByValue(tag.value)
-            if fromDb is None:
-                self.session.add(tag)
-            else:
-                ad.hiddenTags[i].unUse()
-                ad.hiddenTags[i] = fromDb
-                fromDb.use()
+        self._adTags(ad)
         try:
             self.session.commit()
             self.session.add(ad)
             self.session.commit()
             return ad
         except exc.SQLAlchemyError:
+            print("Context: cannot create ad: ", ad)
             return None
 
     def getAds(self, limit, offset=0):
@@ -53,53 +37,57 @@ class Context:
         fromDb = self.getAdById(adId)
         if fromDb is None:
             return None
-        fromDb.update(updated)
-        for i in range(0, len(fromDb.tags)):
-            self._updateTag(fromDb, i)
-        for i in range(0, len(fromDb.hiddenTags)):
-            self._updateTag(fromDb, i, True)
-        self.session.commit()
-        return fromDb
+        self._removeTags(fromDb)
+        self._adTags(updated)
+        try:
+            fromDb.update(updated)
+            self.session.commit()
+            return fromDb
+        except exc.SQLAlchemyError:
+            print("Context: cannot remove ad: ", fromDb)
+            return None
 
-    def _updateTag(self, ad, index, hidden=False):
-        if hidden:
-            tag = ad.hiddenTags[index]
-        else:
-            tag = ad.tags[index]
-        tagFromDb = self.getTagByValue(tag.value)
-        if tagFromDb is None:
-            self.session.add(tag)
-        else:
-            if hidden:
-                ad.hiddenTags[index].unUse()
-                ad.hiddenTags[index] = tagFromDb
-            else:
-                ad.tags[index].unUse()
-                ad.tags[index] = tagFromDb
-            tagFromDb.use()
+    def _adTags(self, ad):
+        try:
+            for tag in ad.tags:
+                self.session.add(tag)
+        except exc.SQLAlchemyError:
+            print("Context: cannot add hidden tags: ", ad.tags)
+            return None
+        try:
+            for tag in ad.hiddenTags:
+                self.session.add(tag)
+        except exc.SQLAlchemyError:
+            print("Context: cannot add hidden tags: ", ad.hiddenTags)
+
+    def _removeTags(self, ad):
+        try:
+            for tag in ad.tags:
+                self.session.query(ad_tags_association).filter_by(tag_id=tag.id).delete()
+                self.session.delete(tag)
+        except exc.SQLAlchemyError:
+            print("Context: cannot delete tags: ", ad.tags)
+            return None
+        try:
+            for tag in ad.hiddenTags:
+                self.session.query(hidden_ad_tags_association).filter_by(tag_id=tag.id).delete()
+                self.session.delete(tag)
+        except exc.SQLAlchemyError:
+            print("Context: cannot delete hidden tags: ", ad.hiddenTags)
 
     def removeAd(self, adId):
         fromDb = self.getAdById(adId)
         if fromDb is None:
             return False
-        for tag in fromDb.tags:
-            self._unhookTag(tag)
-        for tag in fromDb.hiddenTags:
-            self._unhookTag(tag, True)
-        self.session.commit()
-        self.session.delete(fromDb)
-        self.session.commit()
-        return True
-
-    def _unhookTag(self, tag, hidden=False):
-        tag.unUse()
-        if tag.useCount <= 0:
-            if hidden:
-                self.session.query(hidden_ad_tags_association).filter_by(tag_id=tag.id).delete()
-            else:
-                self.session.query(ad_tags_association).filter_by(tag_id=tag.id).delete()
+        self._removeTags(fromDb)
+        try:
             self.session.commit()
-            self.session.delete(tag)
+            self.session.delete(fromDb)
+            self.session.commit()
+            return True
+        except exc.SQLAlchemyError:
+            print("Context: cannot delete ad: ", fromDb)
+            return False
 
     def getTagById(self, tagId):
         return self.session.query(Tag).get(tagId)

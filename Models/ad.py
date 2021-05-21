@@ -26,17 +26,7 @@ class Ad(Base):
         if tags is None:
             return []
         else:
-            for tag in tags:
-                tag.use()
             return tags
-
-    @staticmethod
-    def _reAssignNotNone(oldTags, newTags):
-        for tag in oldTags:
-            tag.unUse()
-        for tag in newTags:
-            tag.use()
-        return newTags
 
     @classmethod
     def default(cls):
@@ -46,8 +36,8 @@ class Ad(Base):
         self.title = updated.title
         self.description = updated.description
         self.imagePath = updated.imagePath
-        self.tags = self._reAssignNotNone(self.tags, updated.tags)
-        self.hiddenTags = self._reAssignNotNone(self.hiddenTags, updated.hiddenTags)
+        self.tags = updated.tags
+        self.hiddenTags = updated.hiddenTags
 
     def __repr__(self):
         return {'id': self.id, 'title': self.title, 'description': self.description, 'imagePath': self.imagePath, 'tags': [tag.__repr__() for tag in self.tags]}

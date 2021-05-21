@@ -12,8 +12,10 @@ class AdsService:
     def __init__(self, context, wordService):
         self.__wordService = wordService
         self.__context = context
-        # stanza.download('en')
-        # stanza.download('pl')
+        stanza.download('en')
+        stanza.download('pl')
+        self.stanza_en = stanza.Pipeline(lang='en', processors='tokenize,mwt,pos,lemma')
+        self.stanza_pl = stanza.Pipeline(lang='pl', processors='tokenize,mwt,pos,lemma')
 
     def getById(self, adId):
         return self.__context.getAdById(adId)
@@ -37,12 +39,11 @@ class AdsService:
             allSimilar.update(similar)
         return Ad(title, description, imagePath, self._tagsFromList(tagsList, True), self._tagsFromList(allSimilar))
 
-    @staticmethod
-    def _lematize(text, lang):
+    def _lematize(self, text, lang):
         if lang == 'pl':
-            stanza_nlp = stanza.Pipeline(lang='pl', processors='tokenize,mwt,pos,lemma')
+            stanza_nlp = self.stanza_pl
         elif lang == 'en':
-            stanza_nlp = stanza.Pipeline(lang='en', processors='tokenize,mwt,pos,lemma')
+            stanza_nlp = self.stanza_en
         else:
             raise ValueError(f'unsupported language {lang}')
         doc = stanza_nlp(text)
@@ -80,8 +81,7 @@ class AdsService:
         sortedByVal = sorted(results.items(), key=lambda kv: kv[1], reverse=True)
         return [adIdToAdMapping[adId] for adId, _ in sortedByVal]
 
-    @staticmethod
-    def _getMeaningfulWords(query, language):
+    def _getMeaningfulWords(self, query, language):
         if language == 'pl':
             nlp = Polish()
         elif language == 'en':
@@ -89,14 +89,13 @@ class AdsService:
         else:
             raise ValueError(f'unsupported language {language}')
 
-        query = AdsService._lematize(query, language)
+        query = self._lematize(query, language)
 
         token_list = [token.text for token in nlp(query)]
         filtered_query = []
         for word in token_list:
             lexeme = nlp.vocab[word]
             if not lexeme.is_stop:
-                # filtered_query.append(ps.stem(word))
                 filtered_query.append(word)
         return filtered_query
 
@@ -104,4 +103,4 @@ class AdsService:
         result = self.__context.getAds(maxCount)
         if len(result) > 0:
             return result[:maxCount]
-        return [Ad.default()]
+        return []
