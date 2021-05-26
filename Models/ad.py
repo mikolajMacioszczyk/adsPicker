@@ -30,7 +30,7 @@ class Ad(Base):
 
     @classmethod
     def default(cls):
-        return Ad('title', 'description', 'path', [Tag('tag')], [Tag('tag')])
+        return Ad('title', 'description', 'path', [Tag('tag', 'en')], [Tag('tag', 'en')])
 
     def update(self, updated):
         self.title = updated.title

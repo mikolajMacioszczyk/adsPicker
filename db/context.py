@@ -65,6 +65,7 @@ class Context:
             for tag in ad.tags:
                 self.session.query(ad_tags_association).filter_by(tag_id=tag.id).delete()
                 self.session.delete(tag)
+                self.session.commit()
         except exc.SQLAlchemyError:
             print("Context: cannot delete tags: ", ad.tags)
             return None
@@ -72,6 +73,7 @@ class Context:
             for tag in ad.hiddenTags:
                 self.session.query(hidden_ad_tags_association).filter_by(tag_id=tag.id).delete()
                 self.session.delete(tag)
+                self.session.commit()
         except exc.SQLAlchemyError:
             print("Context: cannot delete hidden tags: ", ad.hiddenTags)
 

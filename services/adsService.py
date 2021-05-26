@@ -53,9 +53,9 @@ class AdsService:
     @staticmethod
     def _tagsFromList(tagsList, isWrapped=False):
         if isWrapped:
-            return [Tag(tag['value']) for tag in sorted(tagsList, key=lambda t: t['value'])]
+            return [Tag(tag['value'], tag['lang']) for tag in sorted(tagsList, key=lambda t: t['value'])]
         else:
-            return [Tag(tag) for tag in sorted(tagsList, key=lambda t: t)]
+            return [Tag(tag, '') for tag in sorted(tagsList, key=lambda t: t)]
 
     def remove(self, adId):
         return self.__context.removeAd(adId)
